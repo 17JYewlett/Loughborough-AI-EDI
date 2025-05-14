@@ -184,6 +184,11 @@
       <audio controls id="audio-result"></audio>
       <canvas id="waveform"></canvas>
     </div>
+    <!-- Transcript display, will be shown after audio is played and transcript is fetched -->
+    <div id="transcript-box" class="mt-4 d-none">
+      <h5>Transcript</h5>
+      <textarea id="transcript-text" class="form-control" rows="4" readonly></textarea>
+    </div>
   </div>
 </div>
 
@@ -288,6 +293,8 @@
     e.preventDefault();
     loader.classList.remove("d-none");
     audioPlayer.classList.add("d-none");
+    // Hide transcript box before processing
+    document.getElementById("transcript-box").classList.add("d-none");
 
     const formData = new FormData(e.target);
     fetch("upload.php", {
@@ -300,6 +307,21 @@
       audioResult.src = url;
       audioResult.play();
       drawWaveform(blob);
+
+      // Fetch and display transcript after playing audio
+      fetch("transcribe.php", {
+        method: "POST",
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        const transcriptBox = document.getElementById("transcript-box");
+        const transcriptText = document.getElementById("transcript-text");
+        transcriptText.value = data.transcript || "Transcript unavailable.";
+        transcriptBox.classList.remove("d-none");
+      });
+      // Note: You need to create a new PHP file 'transcribe.php' that handles transcription
+      // (e.g., using Whisper API or a placeholder returning fake text for now).
     }).catch(err => {
       loader.classList.add("d-none");
       alert("Error: " + err);
