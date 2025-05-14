@@ -1,57 +1,71 @@
-// Map languages to ElevenLabs voice IDs
 const voiceMap = {
-  en: "Xb7hH8MSUJpSbSDYk0k2", // Alice (British English)
-  fr: "R89ZQJowZAEgiPNyC3dQ", // Jeunot (French)
-  zh: "bhJUNIXWQQ94l8eI2VUf"  // Amy (Mandarin)
+  en: "Xb7hH8MSUJpSbSDYk0k2",
+  fr: "R89ZQJowZAEgiPNyC3dQ",
+  zh: "bhJUNIXWQQ94l8eI2VUf"
 };
 
-// Optional translations (can expand later)
 const translations = {
   en: {
-    title: "AI Voice Changer",
-    desc: "Upload your voice and hear it with a new accent or tone.",
-    submit: "Transform My Voice"
+    title: "AI Voice Transformation",
+    desc: "Upload your audio and convert it into a new voice or accent using ethical AI voice technology.",
+    submit: "Transform Voice"
   },
   fr: {
-    title: "Changeur de Voix IA",
-    desc: "Téléchargez votre voix et écoutez-la avec un nouvel accent.",
-    submit: "Transformer ma voix"
+    title: "Transformation vocale IA",
+    desc: "Téléchargez votre audio et convertissez-le avec un nouvel accent grâce à l'IA éthique.",
+    submit: "Transformer la voix"
   },
   zh: {
-    title: "AI 语音变声器",
-    desc: "上传你的语音并用新的声音听它。",
+    title: "AI 语音转换器",
+    desc: "上传音频，将其转换为新的语音或口音。",
     submit: "转换语音"
   }
 };
 
-// Set default language on page load
 const langSelect = document.getElementById("lang-select");
 const langHidden = document.getElementById("lang-hidden");
 const voiceHidden = document.getElementById("voice-hidden");
 const loader = document.getElementById("loader");
 
-// Apply text translations if used
 const applyTranslations = (lang) => {
-  if (!translations[lang]) return;
-  document.querySelector("[data-i18n='title']").textContent = translations[lang].title;
-  document.querySelector("[data-i18n='desc']").textContent = translations[lang].desc;
-  document.querySelector("[data-i18n='submit']").textContent = translations[lang].submit;
+  const t = translations[lang];
+  if (!t) return;
+  const titleEl = document.querySelector("[data-i18n='title']");
+  const descEl = document.querySelector("[data-i18n='desc']");
+  const submitEl = document.querySelector("[data-i18n='submit']");
+  if (titleEl) titleEl.textContent = t.title;
+  if (descEl) descEl.textContent = t.desc;
+  if (submitEl) submitEl.textContent = t.submit;
 };
 
-// Update voice & language when dropdown changes
 langSelect.addEventListener("change", (e) => {
   const lang = e.target.value;
   langHidden.value = lang;
   voiceHidden.value = voiceMap[lang];
-
-  applyTranslations(lang); // if using translation tags
+  applyTranslations(lang);
 });
 
-// On form submit: ensure correct values and show loader
-document.getElementById("voice-form").addEventListener("submit", (e) => {
-  const lang = langSelect.value;
-  langHidden.value = lang;
-  voiceHidden.value = voiceMap[lang];
+document.getElementById("voice-form").addEventListener("submit", () => {
+  loader.classList.remove("d-none");
+});
 
-  loader.style.display = "block";
+// Drag & drop behavior
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+  }
 });
