@@ -42,7 +42,8 @@
 
     <!-- Upload Box -->
     <div class="border border-2 rounded p-4 mb-4 position-relative" id="drop-zone">
-      <label for="file-input" class="form-label w-100 text-muted" style="cursor: pointer;">
+      <label for="file-input" class="form-label w-100 text-muted" style="cursor: pointer;" id="drop-label">
+        <p class="text-success mt-2 fw-semibold" id="file-name" style="display:none;"></p>
         <i class="bi bi-upload fs-1 d-block mb-2 text-primary"></i>
         <span>Drag & drop your audio here, or click to select</span><br>
         <small class="text-muted">MP3 or WAV, max 30 seconds</small>
@@ -52,11 +53,13 @@
 
     <!-- Accent Selection -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Choose an accent</label>
-      <select class="form-select" id="lang-select-visible" disabled>
-        <option selected>Uses dropdown above</option>
-      </select>
-    </div>
+  <label class="form-label fw-semibold">Accent</label>
+  <select class="form-select" id="lang-select-visible" disabled>
+    <option value="en">British English</option>
+    <option value="fr">French</option>
+    <option value="zh">Mandarin</option>
+  </select>
+</div>
 
     <!-- Submit Button -->
     <button type="submit" class="btn btn-primary btn-lg w-100" data-i18n="submit">
