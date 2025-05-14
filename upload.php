@@ -1,6 +1,6 @@
 <?php
 
-$apiKey = 'sk_e78f5b4bb2a54a10092f82ae2445a3a3eba8d4c9db08df5d';
+$apiKey = 'sk_48ce94b1344dbc38f6136e68a468661ea49328468cbbc88b';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $voiceId = $_POST['voice_id'] ?? 'Xb7hH8MSUJpSbSDYk0k2'; // Default to Alice (English)
@@ -44,4 +44,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Content-Type: text/plain');
         echo "API Error (HTTP $httpCode):\n$response";
     }
+}
+
+if (false) { // Always debug {
+    header('Content-Type: audio/mpeg');
+    header('Content-Disposition: attachment; filename="converted.mp3"');
+    echo $response;
+} else {
+    // Debug mode or failure
+    header('Content-Type: application/json');
+    echo json_encode([
+        'http_code' => $httpCode,
+        'request_voice_id' => $voiceId,
+        'request_lang' => $_POST['lang'] ?? 'unknown',
+        'response' => json_decode($response, true),
+        'raw' => $response
+    ], JSON_PRETTY_PRINT);
 }

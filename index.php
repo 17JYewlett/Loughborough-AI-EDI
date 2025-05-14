@@ -55,9 +55,9 @@
     <div class="mb-4">
   <label class="form-label fw-semibold">Accent</label>
   <select class="form-select" id="lang-select-visible" disabled>
-    <option value="en">British English</option>
-    <option value="fr">French</option>
-    <option value="zh">Mandarin</option>
+    <option value="en">British English - Alice</option>
+    <option value="fr">Français - Jeunot</option>
+    <option value="zh">普通话 - 艾米</option>
   </select>
 </div>
 
