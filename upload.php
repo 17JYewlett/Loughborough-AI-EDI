@@ -1,48 +1,47 @@
 <?php
-$apiKey = getenv('ELEVEN_LABS_API_KEY');
+
+$apiKey = 'sk_e78f5b4bb2a54a10092f82ae2445a3a3eba8d4c9db08df5d';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_FILES['audio']) && $_FILES['audio']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['audio']['tmp_name'];
-        $voiceId = $_POST['voice_id'] ?? 'default';
+    $voiceId = $_POST['voice_id'] ?? 'Xb7hH8MSUJpSbSDYk0k2'; // Default to Alice (English)
 
-        $audioContent = file_get_contents($fileTmpPath);
-
-        // First step: (Optional) Use Speech-to-Text if needed
-        // For now, assume we skip that and already have the content (or it’s text input-based)
-
-        // Step: Send to Text-to-Speech (using predefined text for now)
-        $url = "https://api.elevenlabs.io/v1/text-to-speech/$voiceId";
-
-        $data = [
-            'text' => 'This is your changed voice using ElevenLabs.',
-            'voice_settings' => [
-                'stability' => 0.75,
-                'similarity_boost' => 0.75
-            ]
-        ];
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'xi-api-key: ' . $apiKey,
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        $response = curl_exec($ch);
-
-        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 200) {
-            header('Content-Type: audio/mpeg');
-            header('Content-Disposition: attachment; filename="converted.mp3"');
-            echo $response;
-        } else {
-            echo 'Error: ' . $response;
-        }
-
-        curl_close($ch);
-    } else {
-        echo "File upload error.";
+    if (!isset($_FILES['audio']) || $_FILES['audio']['error'] !== UPLOAD_ERR_OK) {
+        die("Error: Audio file not uploaded.");
     }
-} else {
-    echo "Invalid request.";
+
+    $filePath = $_FILES['audio']['tmp_name'];
+    $fileName = $_FILES['audio']['name'];
+    $mimeType = mime_content_type($filePath);
+
+    $url = "https://api.elevenlabs.io/v1/speech-to-speech/$voiceId/stream";
+
+    $postFields = [
+        'model_id' => 'eleven_multilingual_sts_v2',
+        'output_format' => 'mp3_44100_128',
+        'audio' => new CURLFile($filePath, $mimeType, $fileName)
+    ];
+
+    $headers = [
+        "xi-api-key: $apiKey"
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode === 200) {
+        header('Content-Type: audio/mpeg');
+        header('Content-Disposition: attachment; filename="converted.mp3"');
+        echo $response;
+    } else {
+        header('Content-Type: text/plain');
+        echo "API Error (HTTP $httpCode):\n$response";
+    }
 }
